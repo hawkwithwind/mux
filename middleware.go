@@ -43,14 +43,16 @@ func CORSMethodMiddleware(r *Router) MiddlewareFunc {
 
 			err := r.Walk(func(route *Route, _ *Router, _ []*Route) error {
 				for _, m := range route.matchers {
-					if _, ok := m.(*routeRegexp); ok {
-						if m.Match(req, &RouteMatch{}) {
-							methods, err := route.GetMethods()
-							if err != nil {
-								return err
-							}
+					if rr, ok := m.(*routeRegexp); ok {
+						if rr.regexpType == regexpTypePath {
+							if m.Match(req, &RouteMatch{}) {
+								methods, err := route.GetMethods()
+								if err != nil {
+									return err
+								}
 
-							allMethods = append(allMethods, methods...)
+								allMethods = append(allMethods, methods...)
+							}
 						}
 						break
 					}
